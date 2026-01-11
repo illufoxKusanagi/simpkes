@@ -38,7 +38,7 @@ export default async function Home() {
               <span className="font-semibold">{session.user.email}</span>
             </p>
           ) : (
-             <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex justify-center">
               <Link href="/auth/login">
                 <Button size="lg" className="font-bold">
                   <LogIn className="mr-2 h-4 w-4" /> Masuk ke Aplikasi

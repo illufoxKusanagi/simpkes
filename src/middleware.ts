@@ -13,7 +13,12 @@ export async function middleware(request: NextRequest) {
   // 1. Define Route Groups
   const authRoutes = ["/auth/login", "/auth/register"];
   const publicRoutes = ["/", ...authRoutes]; // Landing and Auth
-  const adminRoutes = ["/dashboard", "/api/users", "/api/devices", "/api/units"];
+  const adminRoutes = [
+    "/dashboard",
+    "/api/users",
+    "/api/devices",
+    "/api/units",
+  ];
 
   // 2. Helper Functions
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
@@ -27,7 +32,7 @@ export async function middleware(request: NextRequest) {
 
   // A. Redirect Authenticated Users away from Auth pages
   if (token && isAuthRoute) {
-    // Redirect to dashboard if admin, or request page if user? 
+    // Redirect to dashboard if admin, or request page if user?
     // For now, let's default to dashboard, but let the dashboard handle the redirect or Role check if strictly distinct.
     // However, if Dashboard is Admin Only, we should send regular users to /request.
     if (token.role === "admin") {

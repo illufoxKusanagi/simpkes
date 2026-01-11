@@ -128,7 +128,8 @@ export function MaintenanceRequestForm() {
       form.reset();
     } catch (error) {
       console.error(error);
-      const errorMessage = error instanceof Error ? error.message : "Silakan coba lagi nanti.";
+      const errorMessage =
+        error instanceof Error ? error.message : "Silakan coba lagi nanti.";
       toast.error("Gagal mengirim laporan", {
         description: errorMessage,
       });
