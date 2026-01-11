@@ -30,7 +30,7 @@ export default async function DashboardPage() {
               Dashboard
             </h1>
             <p className="text-sm font-medium text-muted-foreground mt-2">
-              Sistem Manajemen Pemeliharaan Alat Kesehatan
+              Sistem perbaikan dan perbaikan alat kesehatan
             </p>
           </div>
           <div className="text-right">
