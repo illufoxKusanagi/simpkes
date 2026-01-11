@@ -16,21 +16,6 @@ const deviceSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    if (session.user.role !== "admin") {
-      return NextResponse.json(
-        { success: false, error: "Forbidden - Admin access required" },
-        { status: 403 }
-      );
-    }
-
     const items = await db.select().from(devices);
     return NextResponse.json(items);
   } catch (error) {

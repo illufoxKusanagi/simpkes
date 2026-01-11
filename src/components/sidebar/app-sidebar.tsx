@@ -38,7 +38,7 @@ export function AppSidebar() {
     },
     {
       title: "Form Maintenance",
-      url: "/dashboard/maintenance-form",
+      url: "/request",
       icon: FileText,
       adminOnly: false,
     },

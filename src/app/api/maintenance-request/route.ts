@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { maintenanceRequest } from "@/lib/db/schema";
 import { NextRequest, NextResponse } from "next/server";
 import z, { success } from "zod";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 const maintenanceRequestSchema = z.object({
   name: z.string().min(1, "Nama tidak valid!"),
@@ -15,6 +17,11 @@ const maintenanceRequestSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const items = await db.select().from(maintenanceRequest);
     return NextResponse.json(items);
   } catch (error) {
@@ -28,6 +35,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized - Please login" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const validated = maintenanceRequestSchema.parse(body);
 

@@ -10,36 +10,54 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Public routes that don't require authentication
-  const publicRoutes = ["/", "/auth/login", "/api/auth"];
+  // 1. Define Route Groups
+  const authRoutes = ["/auth/login", "/auth/register"];
+  const publicRoutes = ["/", ...authRoutes]; // Landing and Auth
+  const adminRoutes = ["/dashboard", "/api/users", "/api/devices", "/api/units"];
 
-  // Check if the current path is public
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // 2. Helper Functions
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isPublicRoute =
+    publicRoutes.some((route) =>
+      route === "/" ? pathname === route : pathname.startsWith(route)
+    ) || pathname.startsWith("/api/auth"); // NextAuth endpoints are always public
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
 
-  // If user is not authenticated and trying to access protected route
+  // 3. Logic Flow
+
+  // A. Redirect Authenticated Users away from Auth pages
+  if (token && isAuthRoute) {
+    // Redirect to dashboard if admin, or request page if user? 
+    // For now, let's default to dashboard, but let the dashboard handle the redirect or Role check if strictly distinct.
+    // However, if Dashboard is Admin Only, we should send regular users to /request.
+    if (token.role === "admin") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    } else {
+      return NextResponse.redirect(new URL("/request", request.url));
+    }
+  }
+
+  // B. Protect Private Routes (Redirect Unauthenticated to Login)
   if (!token && !isPublicRoute) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Role-based access control
-  if (token) {
-    const userRole = token.role as string;
-
-    // Admin can access everything
-    if (userRole === "admin") {
-      return NextResponse.next();
+  // C. Role-Based Access Control (Admin Routes)
+  if (token && isAdminRoute && token.role !== "admin") {
+    // If it's an API call, return 403
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 }
+      );
     }
-
-    // Regular users cannot access dashboard
-    if (userRole === "user" && pathname.startsWith("/dashboard")) {
-      return NextResponse.redirect(new URL("/request", request.url));
-    }
+    // If it's a page, redirect to unauthorized
+    return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
+  // Allow access
   return NextResponse.next();
 }
 
@@ -50,7 +68,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder content
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],

@@ -56,23 +56,33 @@ const reportSchema = z.object({
 
 export function MaintenanceRequestForm() {
   const [devices, setDevices] = useState<{ id: string; name: string }[]>([]);
+  const [units, setUnits] = useState<{ id: string; name: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchDevices = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("/api/devices");
-        if (res.ok) {
-          const data = await res.json();
-          setDevices(data);
+        const [devicesRes, unitsRes] = await Promise.all([
+          fetch("/api/devices"),
+          fetch("/api/units"),
+        ]);
+
+        if (devicesRes.ok) {
+          const devicesData = await devicesRes.json();
+          setDevices(devicesData);
+        }
+
+        if (unitsRes.ok) {
+          const unitsData = await unitsRes.json();
+          setUnits(unitsData);
         }
       } catch (error) {
-        console.error("Failed to fetch devices", error);
-        toast.error("Gagal memuat daftar alat.");
+        console.error("Failed to fetch data", error);
+        toast.error("Gagal memuat data.");
       }
     };
-    fetchDevices();
+    fetchData();
   }, []);
 
   const form = useForm<z.infer<typeof reportSchema>>({
@@ -118,8 +128,9 @@ export function MaintenanceRequestForm() {
       form.reset();
     } catch (error) {
       console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "Silakan coba lagi nanti.";
       toast.error("Gagal mengirim laporan", {
-        description: "Silakan coba lagi nanti.",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -164,6 +175,7 @@ export function MaintenanceRequestForm() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={units.length === 0}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -171,12 +183,17 @@ export function MaintenanceRequestForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="ugd">UGD</SelectItem>
-                        <SelectItem value="icu">ICU/HICU/ICCU/NICU</SelectItem>
-                        <SelectItem value="rehab">Ruang Rehab Medik</SelectItem>
-                        <SelectItem value="bersalin">Ruang Bersalin</SelectItem>
-                        <SelectItem value="radiologi">Radiologi</SelectItem>
-                        <SelectItem value="admin">Administrasi</SelectItem>
+                        {units.length === 0 ? (
+                          <SelectItem value="loading" disabled>
+                            Memuat data...
+                          </SelectItem>
+                        ) : (
+                          units.map((unit) => (
+                            <SelectItem key={unit.id} value={unit.name}>
+                              {unit.name}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
