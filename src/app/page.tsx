@@ -19,7 +19,7 @@ export default function Home() {
             SIMPKES RSUD Caruban
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Sistem Informasi Manajemen Pemeliharaan dan Perbaikan Alat Kesehatan
+            Sistem Informasi Manajemen Pemeliharaan Alat Kesehatan
           </p>
         </div>
 

@@ -8,7 +8,7 @@ export default function RequestPage() {
           Layanan Perbaikan Aset
         </h1>
         <p className="text-muted-foreground">
-          Formulir pengajuan perbaikan alat kesehatan dan fasilitas kantor.
+          Formulir pengajuan perbaikan dan perbaikan alat kesehatan.
         </p>
       </div>
 
