@@ -32,7 +32,7 @@ export default function Home() {
                   Dashboard
                 </CardTitle>
                 <CardDescription>
-                  Pantau statistik pengajuan, anggaran, dan status perbaikan.
+                  Pantau statistik pengajuan, dan status perbaikan.
                 </CardDescription>
               </CardHeader>
               <CardContent>
