@@ -1,7 +1,8 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-import { devices } from "../src/lib/db/schema";
+import { devices, users } from "../src/lib/db/schema";
+import { hashPassword } from "../src/lib/auth/password";
 // import { db } from "../src/lib/db/index"; // Moved to main() to avoid hoisting issues
 
 const equipmentList = [
@@ -102,6 +103,35 @@ const equipmentList = [
 
 async function main() {
   const { db } = await import("../src/lib/db/index");
+  
+  // Seed Users
+  console.log("Seeding users...");
+  try {
+    const usersData = [
+      {
+        email: "admin@simpkes.com",
+        password: await hashPassword("admin123"),
+        role: "admin",
+      },
+      {
+        email: "user1@simpkes.com",
+        password: await hashPassword("user123"),
+        role: "user",
+      },
+      {
+        email: "user2@simpkes.com",
+        password: await hashPassword("user123"),
+        role: "user",
+      },
+    ];
+
+    await db.insert(users).values(usersData);
+    console.log("✓ Users seeded successfully!");
+  } catch (error) {
+    console.error("Error seeding users:", error);
+  }
+
+  // Seed Devices
   console.log("Seeding devices...");
 
   // Optional: Clear existing devices if you want a fresh start
@@ -113,11 +143,12 @@ async function main() {
 
   try {
     await db.insert(devices).values(values);
-    console.log("Seed done!");
+    console.log("✓ Devices seeded successfully!");
   } catch (error) {
     console.error("Error seeding devices:", error);
   }
 
+  console.log("\n🎉 All seeding complete!");
   process.exit(0);
 }
 

@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import AuthProvider from "@/components/providers/auth-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,25 +33,27 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="absolute top-4 right-4 z-50">
-            <ModeToggle />
-          </div>
-          <SidebarProvider>
-            <AppSidebar />
-            <main>
-              <SidebarTrigger />
-              {children}
-            </main>
-          </SidebarProvider>
-          {/* {children} */}
-          <Toaster />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="absolute top-4 right-4 z-50">
+              <ModeToggle />
+            </div>
+            <SidebarProvider>
+              <AppSidebar />
+              <main>
+                <SidebarTrigger />
+                {children}
+              </main>
+            </SidebarProvider>
+            {/* {children} */}
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

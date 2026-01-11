@@ -96,15 +96,16 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
     // Be careful with loop condition to handle month wrapping correctly
     while (iterDate <= endDate || iterDate.getMonth() === endDate.getMonth()) {
       const monthKey = iterDate.toISOString().slice(0, 7);
-      
+
       // Stop if we've gone past the current month (handled by loop condition, but double check)
-      if (iterDate > endDate && iterDate.getMonth() !== endDate.getMonth()) break;
+      if (iterDate > endDate && iterDate.getMonth() !== endDate.getMonth())
+        break;
 
       result.push({
         date: monthKey, // "2024-01"
         requests: countsByMonth[monthKey] || 0,
       });
-      
+
       // Increment month
       iterDate.setMonth(iterDate.getMonth() + 1);
     }
@@ -213,7 +214,7 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
                   const date = new Date(value + "-01"); // Append day to make parsing consistent
                   return date.toLocaleDateString("id-ID", {
                     month: "short",
-                    year: "numeric"
+                    year: "numeric",
                   });
                 }}
               />
@@ -223,10 +224,13 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
                     className="w-37.5"
                     nameKey="requests"
                     labelFormatter={(value) => {
-                      return new Date(value + "-01").toLocaleDateString("id-ID", {
-                        month: "long",
-                        year: "numeric",
-                      });
+                      return new Date(value + "-01").toLocaleDateString(
+                        "id-ID",
+                        {
+                          month: "long",
+                          year: "numeric",
+                        }
+                      );
                     }}
                   />
                 }
