@@ -9,11 +9,9 @@ import { z } from "zod";
 
 // Schema for updating user (all fields optional for partial updates)
 const updateUserSchema = z.object({
-  email: z.email("Invalid email format").optional(),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .optional(),
+  username: z.string("Username tidak valid").optional(),
+  email: z.email("Format email tidak valid").optional(),
+  password: z.string().min(8, "Password minimal harus 8 karakter").optional(),
   role: z.enum(["admin", "user"]).optional(),
 });
 
@@ -63,6 +61,9 @@ export async function PATCH(
     // 6. Prepare update object (only include fields that were provided)
     const updateData: Partial<typeof users.$inferInsert> = {};
 
+    if (validatedData.username) {
+      updateData.email = validatedData.email;
+    }
     if (validatedData.email) {
       updateData.email = validatedData.email;
     }
@@ -82,9 +83,10 @@ export async function PATCH(
     return NextResponse.json(
       {
         success: true,
-        message: "User updated successfully",
+        message: "User berhasil diperbarui!",
         data: {
           id,
+          username: updateData.username || existingUser.username,
           email: updateData.email || existingUser.email,
           role: updateData.role || existingUser.role,
         },
@@ -106,7 +108,7 @@ export async function PATCH(
     }
 
     return NextResponse.json(
-      { success: false, error: "Failed to update user" },
+      { success: false, error: "Error dalam memperbarui user!" },
       { status: 500 }
     );
   }

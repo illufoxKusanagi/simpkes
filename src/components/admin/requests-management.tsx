@@ -1,9 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2, Pencil } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -34,12 +42,12 @@ import { toast } from "sonner";
 import { MaintenanceRequest } from "@/lib/db/schema";
 
 const statusColors = {
-  pending:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  in_progress: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+  approved:
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200", // Diterima
+  in_progress: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200", // Diproses
   completed:
-    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200", //  Selesai
+  cancelled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200", // Ditolak / Dibatalkan
 };
 
 export function RequestsManagement() {
@@ -47,6 +55,10 @@ export function RequestsManagement() {
   const [loading, setLoading] = useState(true);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editStatusDialogOpen, setEditStatusDialogOpen] = useState(false);
+  const [editingRequest, setEditingRequest] =
+    useState<MaintenanceRequest | null>(null);
+  const [newStatus, setNewStatus] = useState<string>("");
   const [selectedRequest, setSelectedRequest] =
     useState<MaintenanceRequest | null>(null);
   const [deletingRequest, setDeletingRequest] =
@@ -70,6 +82,32 @@ export function RequestsManagement() {
       toast.error("Gagal memuat data permintaan");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/maintenance-request/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success(
+          `Status berhasil diperbarui menjadi ${getStatusLabel(newStatus)}`
+        );
+        fetchRequests();
+      } else {
+        toast.error(data.error || "Gagal memperbarui status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Gagal memperbarui status");
     }
   };
 
@@ -102,10 +140,10 @@ export function RequestsManagement() {
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      pending: "Menunggu",
+      approved: "Diterima",
       in_progress: "Diproses",
       completed: "Selesai",
-      cancelled: "Dibatalkan",
+      cancelled: "Ditolak",
     };
     return labels[status as keyof typeof labels] || status;
   };
@@ -172,23 +210,38 @@ export function RequestsManagement() {
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
                           onClick={() => {
                             setSelectedRequest(request);
                             setDetailDialogOpen(true);
                           }}
+                          title="Lihat Detail"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          onClick={() => {
+                            setEditingRequest(request);
+                            setNewStatus(request.status || "approved");
+                            setEditStatusDialogOpen(true);
+                          }}
+                          title="Ubah Status"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           onClick={() => {
                             setDeletingRequest(request);
                             setDeleteDialogOpen(true);
                           }}
+                          title="Hapus"
                         >
-                          <Trash2 className="h-4 w-4 text-destructive" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -291,6 +344,57 @@ export function RequestsManagement() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
+      {/* Edit Status Dialog */}
+      <Dialog
+        open={editStatusDialogOpen}
+        onOpenChange={setEditStatusDialogOpen}
+      >
+        <DialogContent className="sm:max-w-106.25">
+          <DialogHeader>
+            <DialogTitle>Ubah Status</DialogTitle>
+            <DialogDescription>
+              Ubah status permintaan maintenance ini.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="status" className="text-right">
+                Status
+              </Label>
+              <Select value={newStatus} onValueChange={setNewStatus}>
+                <SelectTrigger className="col-span-3 w-full">
+                  <SelectValue placeholder="Pilih status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="approved">Diterima</SelectItem>
+                  <SelectItem value="in_progress">Diproses</SelectItem>
+                  <SelectItem value="completed">Selesai</SelectItem>
+                  <SelectItem value="cancelled">Ditolak</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setEditStatusDialogOpen(false)}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={async () => {
+                if (editingRequest) {
+                  await handleUpdateStatus(editingRequest.id, newStatus);
+                  setEditStatusDialogOpen(false);
+                }
+              }}
+            >
+              Simpan
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

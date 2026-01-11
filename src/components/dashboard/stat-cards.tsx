@@ -8,9 +8,10 @@ interface StatCardProps {
 
 interface DashboardStatsProps {
   stats: {
-    pending: number;
+    // pending: number;
+    in_progress: number;
     approved: number;
-    rejected: number;
+    cancelled: number;
     completed: number;
   };
 }
@@ -29,24 +30,24 @@ function StatCard({ label, count, className }: StatCardProps) {
 export function DashboardStats({ stats }: DashboardStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {/* Pengajuan (Requests) - Orange/Salmon */}
+      {/* Diterima (Approved) - Green */}
       <StatCard
-        label="Pengajuan"
-        count={stats.pending}
-        className="bg-[#FFA07A]"
-      />
-
-      {/* Disetujui (Approved) - Green */}
-      <StatCard
-        label="Disetujui"
+        label="Diterima"
         count={stats.approved}
         className="bg-[#4CAF50]"
       />
 
-      {/* Ditolak (Rejected) - Red */}
+      {/* Diproses (In Progress) - Orange/Salmon */}
+      <StatCard
+        label="Diproses"
+        count={stats.in_progress}
+        className="bg-[#FFA07A]"
+      />
+
+      {/* Ditolak (Cancelled) - Red */}
       <StatCard
         label="Ditolak"
-        count={stats.rejected}
+        count={stats.cancelled}
         className="bg-[#D32F2F]"
       />
 

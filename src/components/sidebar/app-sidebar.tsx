@@ -37,7 +37,7 @@ export function AppSidebar() {
       adminOnly: false,
     },
     {
-      title: "Form Maintenance",
+      title: "Form Aduan ",
       url: "/request",
       icon: FileText,
       adminOnly: false,
@@ -74,7 +74,7 @@ export function AppSidebar() {
                     SIMPKES
                   </p>
                   <CardDescription className="text-xs text-wrap w-full">
-                    Sistem Informasi Manajemen Perawatan Kesehatan
+                    Sistem Informasi Manajemen Pemeliharaan Alat Kesehatan
                   </CardDescription>
                 </div>
               </div>

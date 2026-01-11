@@ -1,0 +1,1 @@
+ALTER TABLE "maintenance_request" ALTER COLUMN "status" SET DEFAULT 'approved';

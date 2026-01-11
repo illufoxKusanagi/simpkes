@@ -121,11 +121,10 @@ export function MaintenanceRequestForm() {
       if (!res.ok) {
         throw new Error(data.error || "Something went wrong");
       }
-
+      form.reset();
       toast.success("Laporan berhasil dikirim!", {
         description: "Admin akan segera memverifikasi laporan Anda.",
       });
-      form.reset();
     } catch (error) {
       console.error(error);
       const errorMessage =
@@ -166,56 +165,56 @@ export function MaintenanceRequestForm() {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="unit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit / Ruangan</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={units.length === 0}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pilih Unit" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {units.length === 0 ? (
-                          <SelectItem value="loading" disabled>
-                            Memuat data...
-                          </SelectItem>
-                        ) : (
-                          units.map((unit) => (
-                            <SelectItem key={unit.id} value={unit.name}>
-                              {unit.name}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tanggal Kejadian</FormLabel>
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
+            <FormField
+              control={form.control}
+              name="unit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Unit / Ruangan</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={units.length === 0}
+                  >
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Pilih Unit" />
+                      </SelectTrigger>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                    <SelectContent>
+                      {units.length === 0 ? (
+                        <SelectItem value="loading" disabled>
+                          Memuat data...
+                        </SelectItem>
+                      ) : (
+                        units.map((unit) => (
+                          <SelectItem key={unit.id} value={unit.name}>
+                            {unit.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tanggal Kejadian</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* </div> */}
 
             <FormField
               control={form.control}
@@ -229,7 +228,7 @@ export function MaintenanceRequestForm() {
                     disabled={devices.length === 0}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Pilih Nama Alat" />
                       </SelectTrigger>
                     </FormControl>
@@ -266,21 +265,33 @@ export function MaintenanceRequestForm() {
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full h-auto min-h-12 py-3 text-left [&>span]:whitespace-normal [&>span]:line-clamp-none">
                         <SelectValue placeholder="Seberapa mendesak?" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="low">
+                      <SelectItem
+                        value="low"
+                        className="whitespace-normal h-auto py-2"
+                      >
                         Rendah (Low) - Tidak Mengganggu Layanan
                       </SelectItem>
-                      <SelectItem value="medium">
+                      <SelectItem
+                        value="medium"
+                        className="whitespace-normal h-auto py-2"
+                      >
                         Sedang (Medium) - Layanan Terganggu Minor
                       </SelectItem>
-                      <SelectItem value="high">
+                      <SelectItem
+                        value="high"
+                        className="whitespace-normal h-auto py-2"
+                      >
                         Tinggi (High) - Alat Vital / Layanan Terhenti
                       </SelectItem>
-                      <SelectItem value="critical">
+                      <SelectItem
+                        value="critical"
+                        className="whitespace-normal h-auto py-2"
+                      >
                         Kritis (Critical) - Membahayakan Pasien
                       </SelectItem>
                     </SelectContent>

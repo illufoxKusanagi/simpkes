@@ -1,7 +1,12 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-import { devices, users } from "../src/lib/db/schema";
+import {
+  devices,
+  users,
+  units,
+  maintenanceRequest,
+} from "../src/lib/db/schema";
 import { hashPassword } from "../src/lib/auth/password";
 // import { db } from "../src/lib/db/index"; // Moved to main() to avoid hoisting issues
 
@@ -101,6 +106,21 @@ const equipmentList = [
   "Ventilator",
 ];
 
+const unitsList = [
+  "UGD",
+  "RUANG OPERASI (OK)",
+  "ICU/HICU/ICCU/NICU",
+  "RUANG RADIOLOGI",
+  "LABORATORIUM",
+  "FARMASI",
+  "RUANG RAWAT INAP",
+  "RUANG REHAB MEDIK",
+  "RUANG BERSALIN",
+  "APOTEK",
+  "POLIKLINIK",
+  "RUANG ADMIN",
+];
+
 async function main() {
   const { db } = await import("../src/lib/db/index");
 
@@ -108,6 +128,8 @@ async function main() {
 
   // Delete in correct order (respect foreign key constraints)
   try {
+    await db.delete(maintenanceRequest);
+    await db.delete(units);
     await db.delete(devices);
     await db.delete(users);
     console.log("✓ Existing data cleared!\n");
@@ -160,6 +182,19 @@ async function main() {
     console.log(`✓ ${values.length} devices seeded successfully!`);
   } catch (error) {
     console.error("Error seeding devices:", error);
+  }
+
+  // Seed Units
+  console.log("Seeding units...");
+  try {
+    const unitValues = unitsList.map((name) => ({
+      name,
+    }));
+
+    await db.insert(units).values(unitValues);
+    console.log(`✓ ${unitValues.length} units seeded successfully!`);
+  } catch (error) {
+    console.error("Error seeding units:", error);
   }
 
   console.log("\n🎉 All seeding complete!");

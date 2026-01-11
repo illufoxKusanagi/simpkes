@@ -17,7 +17,7 @@ export const maintenanceRequest = pgTable("maintenance_request", {
   damage_description: varchar({ length: 1000 }).notNull(),
   photo_url: varchar({ length: 500 }),
   applicant_date: date().notNull(),
-  status: varchar({ length: 20 }).default("pending").notNull(),
+  status: varchar({ length: 20 }).default("approved").notNull(),
 });
 
 export const devices = pgTable("devices", {

@@ -11,9 +11,10 @@ export default async function DashboardPage() {
   const requests = await db.select().from(maintenanceRequest);
 
   const stats = {
-    pending: requests.filter((r) => r.status === "pending").length,
+    // pending: requests.filter((r) => r.status === "pending").length,
     approved: requests.filter((r) => r.status === "approved").length,
-    rejected: requests.filter((r) => r.status === "rejected").length,
+    in_progress: requests.filter((r) => r.status === "in_progress").length,
+    cancelled: requests.filter((r) => r.status === "cancelled").length,
     completed: requests.filter((r) => r.status === "completed").length,
   };
 

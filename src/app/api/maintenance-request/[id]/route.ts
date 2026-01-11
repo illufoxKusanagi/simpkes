@@ -21,7 +21,7 @@ const updateMaintenanceRequestSchema = z.object({
     .optional(),
   photo_url: z.string().optional(),
   status: z
-    .enum(["pending", "in_progress", "completed", "cancelled"])
+    .enum(["approved", "in_progress", "completed", "cancelled"])
     .optional(),
 });
 
