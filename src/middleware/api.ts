@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth/jwt";
 import { z } from "zod";
 
-export interface AuthenticatedRequest extends NextRequest {
-  user?: {
-    userId: string;
-    email: string;
-  };
-}
-
 export interface RequestWithValidation<T = unknown> extends NextRequest {
-  validatedData?: T;
+  validatedData?: T | unknown;
 }
 
 export class ApiError extends Error {
@@ -22,38 +14,6 @@ export class ApiError extends Error {
     super(message);
     this.name = "ApiError";
   }
-}
-
-export function createAuthMiddleware() {
-  return async (req: AuthenticatedRequest) => {
-    try {
-      const authHeader = req.headers.get("authorization");
-      if (!authHeader?.startsWith("Bearer ")) {
-        throw new ApiError(
-          "Missing or invalid authorization header",
-          401,
-          "UNAUTHORIZED"
-        );
-      }
-
-      const token = authHeader.substring(7);
-      const payload = verifyToken(token);
-
-      if (payload.type !== "access") {
-        throw new ApiError("Invalid token type", 401, "INVALID_TOKEN");
-      }
-
-      req.user = {
-        userId: payload.userId,
-        email: payload.email,
-      };
-
-      return req;
-    } catch (error) {
-      if (error instanceof ApiError) throw error;
-      throw new ApiError("Authentication failed", 401, "AUTH_FAILED");
-    }
-  };
 }
 
 export function createValidationMiddleware<T>(
@@ -222,27 +182,21 @@ export const commonMiddleware = {
     createRateLimitMiddleware(rateLimit?.maxRequests, rateLimit?.windowMs),
   ],
 
-  // For authenticated endpoints
-  authenticated: (rateLimit?: { maxRequests?: number; windowMs?: number }) => [
-    createRateLimitMiddleware(rateLimit?.maxRequests, rateLimit?.windowMs),
-    createAuthMiddleware(),
-  ],
-
-  // For admin-only endpoints
-  // TODO : Apply this for admins
-  admin: (rateLimit?: { maxRequests?: number; windowMs?: number }) => [
-    createRateLimitMiddleware(rateLimit?.maxRequests, rateLimit?.windowMs),
-    createAuthMiddleware(),
-  ],
-
-  // For endpoints with validation
-  validated: <T>(
+  // For admin-only endpoints with validation (auth checked in route handlers via getServerSession)
+  adminValidated: <T>(
     schema: z.ZodSchema<T>,
-    auth = false,
     rateLimit?: { maxRequests?: number; windowMs?: number }
   ) => [
     createRateLimitMiddleware(rateLimit?.maxRequests, rateLimit?.windowMs),
-    ...(auth ? [createAuthMiddleware()] : []),
+    createValidationMiddleware(schema),
+  ],
+
+  // For endpoints with validation (auth checked in route handlers if needed)
+  validated: <T>(
+    schema: z.ZodSchema<T>,
+    rateLimit?: { maxRequests?: number; windowMs?: number }
+  ) => [
+    createRateLimitMiddleware(rateLimit?.maxRequests, rateLimit?.windowMs),
     createValidationMiddleware(schema),
   ],
 };

@@ -1,83 +1,19 @@
-import { z } from "zod";
-import { NextRequest, NextResponse } from "next/server";
-import {
-  ApiError,
-  createRateLimitMiddleware,
-  createValidationMiddleware,
-  withMiddleware,
-  RequestWithValidation,
-} from "@/middleware/api";
-// import { getDb } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { verifyPassword } from "@/lib/auth/password";
-import { generateTokens } from "@/lib/auth/jwt";
-import { db } from "@/lib/db";
+/**
+ * This file is no longer needed - NextAuth handles authentication.
+ * Login is handled by NextAuth at /api/auth/signin
+ * To sign in programmatically, use: signIn('credentials', { identifier, password })
+ *
+ * This file can be safely deleted.
+ */
 
-const loginSchema = z.object({
-  identifier: z.string().min(1, "Masukkan email atau username"),
-  password: z.string().min(1, "Masukkan password"),
-});
+import { NextResponse } from "next/server";
 
-async function loginHandler(
-  request: RequestWithValidation<z.infer<typeof loginSchema>>
-) {
-  const { identifier, password } = request.validatedData || {};
-  if (!identifier || !password) {
-    throw new ApiError(
-      "Email/username dan password diperlukan",
-      400,
-      "MISSING_CREDENTIALS"
-      // { received: { identifier: !!identifier, password: !!password } }
-    );
-  }
-
-  // Find user by email or username
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, identifier))
-    .limit(1);
-
-  if (!user) {
-    throw new ApiError("Invalid credentials", 401);
-  }
-
-  const isPasswordValid = await verifyPassword(password, user.password);
-  if (!isPasswordValid) {
-    throw new ApiError("Invalid credentials", 401);
-  }
-
-  const { accessToken, refreshToken } = generateTokens(user.id, user.email);
-
-  const response = NextResponse.json({
-    success: true,
-    message: "Login successful",
-    data: {
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      accessToken,
+export async function POST() {
+  return NextResponse.json(
+    {
+      error: "Use NextAuth for authentication",
+      signInUrl: "/api/auth/signin",
     },
-  });
-
-  // Set refresh token as HTTP-only cookie
-  response.cookies.set("refresh-token", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
-
-  return response;
+    { status: 410 }
+  );
 }
-
-// Edited here: Your original middleware composition approach
-export const POST = (request: NextRequest) => {
-  return withMiddleware(
-    createRateLimitMiddleware(5, 300000),
-    createValidationMiddleware(loginSchema)
-  )(request, loginHandler);
-};

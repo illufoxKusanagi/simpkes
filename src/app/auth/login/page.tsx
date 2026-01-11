@@ -110,7 +110,9 @@ function LoginContent() {
       <Card className="w-full max-w-xs">
         <CardHeader className="text-center m-2">
           <CardTitle>Login</CardTitle>
-          <CardDescription>Login untuk menggunakan </CardDescription>
+          <CardDescription>
+            Login untuk menggunakan aplikasi ini
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -120,7 +122,7 @@ function LoginContent() {
                 name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username atau Email</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
                         type="text"

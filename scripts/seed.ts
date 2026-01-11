@@ -103,23 +103,37 @@ const equipmentList = [
 
 async function main() {
   const { db } = await import("../src/lib/db/index");
-  
+
+  console.log("🗑️  Clearing existing data...");
+
+  // Delete in correct order (respect foreign key constraints)
+  try {
+    await db.delete(devices);
+    await db.delete(users);
+    console.log("✓ Existing data cleared!\n");
+  } catch (error) {
+    console.error("Error clearing data:", error);
+  }
+
   // Seed Users
   console.log("Seeding users...");
   try {
     const usersData = [
       {
         email: "admin@simpkes.com",
+        username: "Admin Simpkes",
         password: await hashPassword("admin123"),
         role: "admin",
       },
       {
         email: "user1@simpkes.com",
+        username: "User 1",
         password: await hashPassword("user123"),
         role: "user",
       },
       {
         email: "user2@simpkes.com",
+        username: "User 2",
         password: await hashPassword("user123"),
         role: "user",
       },
@@ -134,16 +148,16 @@ async function main() {
   // Seed Devices
   console.log("Seeding devices...");
 
-  // Optional: Clear existing devices if you want a fresh start
-  // await db.delete(devices);
-
-  const values = equipmentList.map((name) => ({
-    name,
-  }));
-
   try {
+    // Remove duplicates from equipmentList
+    const uniqueEquipment = [...new Set(equipmentList)];
+
+    const values = uniqueEquipment.map((name) => ({
+      name,
+    }));
+
     await db.insert(devices).values(values);
-    console.log("✓ Devices seeded successfully!");
+    console.log(`✓ ${values.length} devices seeded successfully!`);
   } catch (error) {
     console.error("Error seeding devices:", error);
   }

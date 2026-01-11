@@ -1,5 +1,7 @@
 import { DashboardCharts } from "@/components/dashboard/charts";
 import { DashboardStats } from "@/components/dashboard/stat-cards";
+// import { MaintenanceTable } from "@/components/dashboard/maintenance-table";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { db } from "@/lib/db";
 import { maintenanceRequest } from "@/lib/db/schema";
 
@@ -21,40 +23,31 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-background p-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight uppercase">
-              Dashboard
-            </h1>
-            <p className="text-sm font-medium text-muted-foreground mt-2">
-              Sistem perbaikan dan perbaikan alat kesehatan
-            </p>
+    <DashboardLayout>
+      <div className="min-h-screen bg-background font-sans">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight uppercase">
+                Dashboard
+              </h1>
+              <p className="text-sm font-medium text-muted-foreground mt-2">
+                Sistem perbaikan dan perbaikan alat kesehatan
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-bold text-foreground">RSUD Caruban</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-bold text-foreground">RSUD Caruban</p>
-          </div>
-        </div>
 
-        {/* Stats Cards */}
-        <DashboardStats stats={stats} />
+          {/* Stats Cards */}
+          <DashboardStats stats={stats} />
 
-        {/* Charts Section */}
-        <DashboardCharts data={chartData} />
-
-        {/* Note Section (Visual Match) */}
-        <div className="bg-muted/50 rounded-lg p-6 border border-border">
-          <h3 className="font-bold text-foreground mb-4">
-            Status Pemeliharaan (Preview)
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Table data is hidden as requested. Visit the full requests page for
-            details.
-          </p>
+          {/* Charts Section */}
+          <DashboardCharts data={chartData} />
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

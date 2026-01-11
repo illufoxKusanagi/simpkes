@@ -167,7 +167,7 @@ export function DashboardCharts({ data }: DashboardChartsProps) {
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="text-muted-foreground leading-none">
-            5 Alat Teratas
+            3 Alat Teratas
           </div>
         </CardFooter>
       </Card>

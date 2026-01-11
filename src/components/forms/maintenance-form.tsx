@@ -90,10 +90,12 @@ export function MaintenanceRequestForm() {
   async function onSubmit(values: z.infer<typeof reportSchema>) {
     setIsLoading(true);
     try {
+      const selectedDevice = devices.find((d) => d.id === values.assetName);
+
       const payload = {
         name: values.fullName,
         unit: values.unit,
-        deviceName: values.assetName,
+        deviceName: selectedDevice?.name || values.assetName,
         damageDescription: values.description,
         imageUrl: "", // Placeholder until upload is implemented
       };
@@ -220,7 +222,7 @@ export function MaintenanceRequestForm() {
                         </SelectItem>
                       ) : (
                         devices.map((device) => (
-                          <SelectItem key={device.id} value={device.name}>
+                          <SelectItem key={device.id} value={device.id}>
                             {device.name}
                           </SelectItem>
                         ))

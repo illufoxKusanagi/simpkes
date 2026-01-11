@@ -2,6 +2,7 @@ import { date, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
+  username: varchar("username", { length: 100 }).notNull().unique(),
   email: varchar("email", { length: 100 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   role: varchar("role").default("user").notNull(),
@@ -25,9 +26,17 @@ export const devices = pgTable("devices", {
   date_added: date().defaultNow(),
 });
 
+export const units = pgTable("units", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 100 }).notNull(),
+  dateAdded: date("date_added").defaultNow(),
+});
+
 export type MaintenanceRequest = typeof maintenanceRequest.$inferSelect;
 export type NewMaintenanceRequest = typeof maintenanceRequest.$inferInsert;
 export type Devices = typeof devices.$inferSelect;
 export type NewDevices = typeof devices.$inferInsert;
 export type NewUsers = typeof users.$inferInsert;
 export type Users = typeof users.$inferSelect;
+export type Units = typeof units.$inferSelect;
+export type NewUnits = typeof units.$inferInsert;

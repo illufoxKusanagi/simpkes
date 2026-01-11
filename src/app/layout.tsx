@@ -40,17 +40,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="absolute top-4 right-4 z-50">
-              <ModeToggle />
-            </div>
-            <SidebarProvider>
-              <AppSidebar />
-              <main>
-                <SidebarTrigger />
-                {children}
-              </main>
-            </SidebarProvider>
-            {/* {children} */}
+            {children}
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
