@@ -124,7 +124,7 @@ export function AppSidebar() {
       >
         {open ? (
           <p className="text-sm text-center">
-            Made with love by <br />
+            Made by <br />
             <Link href={"https://github.com/illufoxKusanagi"}>
               <span className="hover:underline text-primary-600 dark:text-primary-300">
                 Illufox Kusanagi
