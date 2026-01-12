@@ -1,3 +1,4 @@
+import { RequestsManagement } from "@/components/admin/requests-management";
 import { DashboardCharts } from "@/components/dashboard/charts";
 import { DashboardStats } from "@/components/dashboard/stat-cards";
 // import { MaintenanceTable } from "@/components/dashboard/maintenance-table";
@@ -47,6 +48,7 @@ export default async function DashboardPage() {
 
           {/* Charts Section */}
           <DashboardCharts data={chartData} />
+          <RequestsManagement />
         </div>
       </div>
     </DashboardLayout>

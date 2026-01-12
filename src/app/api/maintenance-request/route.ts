@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
       damage_description: validated.damageDescription,
       photo_url: validated.imageUrl || null,
       applicant_date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+      status: "approved",
     };
 
     const result = await db

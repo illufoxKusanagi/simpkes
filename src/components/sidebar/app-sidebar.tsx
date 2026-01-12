@@ -118,13 +118,13 @@ export function AppSidebar() {
 
       <SidebarFooter
         className={cn(
-          "w-full bg-accent/50 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300",
+          "w-full bg-accent/50 backdrop-blur supports-backdrop-filter:bg-background/60 transition-all duration-300",
           open ? "p-4" : "p-2"
         )}
       >
         {open ? (
           <p className="text-sm text-center">
-            Made with ❤️ by <br />
+            Made with love by <br />
             <Link href={"https://github.com/illufoxKusanagi"}>
               <span className="hover:underline text-primary-600 dark:text-primary-300">
                 Illufox Kusanagi
@@ -134,7 +134,7 @@ export function AppSidebar() {
         ) : (
           <div className="flex items-center justify-center">
             <Link href={"https://github.com/illufoxKusanagi"}>
-              <span className="text-xl">❤️</span>
+              <span className="text-xl">Love</span>
             </Link>
           </div>
         )}
