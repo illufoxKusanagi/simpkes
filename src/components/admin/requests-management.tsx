@@ -50,7 +50,11 @@ const statusColors = {
   cancelled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200", // Ditolak / Dibatalkan
 };
 
-export function RequestsManagement() {
+interface RequestsManagementProps {
+  role: string | undefined;
+}
+
+export function RequestsManagement({ role }: RequestsManagementProps) {
   const [requests, setRequests] = useState<MaintenanceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -155,8 +159,8 @@ export function RequestsManagement() {
   return (
     <>
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Input placeholder="Cari permintaan..." className="max-w-sm" />
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+          <Input placeholder="Cari alat..." className="w-full" />
         </div>
 
         <div className="rounded-md border">
@@ -169,7 +173,9 @@ export function RequestsManagement() {
                 <TableHead>Deskripsi</TableHead>
                 <TableHead>Tanggal</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
+                {role === "admin" && (
+                  <TableHead className="text-right">Aksi</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -206,45 +212,47 @@ export function RequestsManagement() {
                         {getStatusLabel(request.status)}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setSelectedRequest(request);
-                            setDetailDialogOpen(true);
-                          }}
-                          title="Lihat Detail"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setEditingRequest(request);
-                            setNewStatus(request.status || "approved");
-                            setEditStatusDialogOpen(true);
-                          }}
-                          title="Ubah Status"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => {
-                            setDeletingRequest(request);
-                            setDeleteDialogOpen(true);
-                          }}
-                          title="Hapus"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                    {role === "admin" && (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setDetailDialogOpen(true);
+                            }}
+                            title="Lihat Detail"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditingRequest(request);
+                              setNewStatus(request.status || "approved");
+                              setEditStatusDialogOpen(true);
+                            }}
+                            title="Ubah Status"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => {
+                              setDeletingRequest(request);
+                              setDeleteDialogOpen(true);
+                            }}
+                            title="Hapus"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               )}

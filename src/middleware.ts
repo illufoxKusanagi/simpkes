@@ -14,10 +14,9 @@ export async function middleware(request: NextRequest) {
   const authRoutes = ["/auth/login", "/auth/register"];
   const publicRoutes = ["/", ...authRoutes]; // Landing and Auth
   const adminRoutes = [
-    "/dashboard",
+    "/dashboard/manage",
+    "/manage", // Just in case
     "/api/users",
-    "/api/devices",
-    "/api/units",
   ];
 
   // 2. Helper Functions
@@ -32,14 +31,7 @@ export async function middleware(request: NextRequest) {
 
   // A. Redirect Authenticated Users away from Auth pages
   if (token && isAuthRoute) {
-    // Redirect to dashboard if admin, or request page if user?
-    // For now, let's default to dashboard, but let the dashboard handle the redirect or Role check if strictly distinct.
-    // However, if Dashboard is Admin Only, we should send regular users to /request.
-    if (token.role === "admin") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    } else {
-      return NextResponse.redirect(new URL("/request", request.url));
-    }
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   // B. Protect Private Routes (Redirect Unauthenticated to Login)
@@ -58,8 +50,10 @@ export async function middleware(request: NextRequest) {
         { status: 403 }
       );
     }
-    // If it's a page, redirect to unauthorized
-    return NextResponse.redirect(new URL("/unauthorized", request.url));
+    // If it's a page, redirect to dashboard with error param
+    const url = new URL("/dashboard", request.url);
+    url.searchParams.set("error", "unauthorized");
+    return NextResponse.redirect(url);
   }
 
   // Allow access

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { Upload } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -57,6 +58,8 @@ const reportSchema = z.object({
 export function MaintenanceRequestForm() {
   const [devices, setDevices] = useState<{ id: string; name: string }[]>([]);
   const [units, setUnits] = useState<{ id: string; name: string }[]>([]);
+  const [fileName, setFileName] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -323,11 +326,42 @@ export function MaintenanceRequestForm() {
               control={form.control}
               name="photo"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="w-full">
                   <FormLabel>Upload Foto Bukti (Opsional)</FormLabel>
                   <FormControl>
-                    <Input type="file" accept="image/*" />
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      ref={(e) => {
+                        field.ref(e);
+                        fileInputRef.current = e;
+                      }}
+                      name={field.name}
+                      onBlur={field.onBlur}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setFileName(file.name);
+                          field.onChange(e.target.files);
+                        }
+                      }}
+                    />
                   </FormControl>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full max-w-37.5"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Pilih File
+                    </Button>
+                    <span className="text-sm text-muted-foreground flex-1 truncate">
+                      {fileName || "Belum ada file dipilih"}
+                    </span>
+                  </div>
                   <FormDescription>
                     Ambil foto kerusakan alat untuk memudahkan verifikasi.
                   </FormDescription>

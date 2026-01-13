@@ -1,11 +1,13 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useSession, signOut } from "next-auth/react";
 import { LogOut, User } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +25,22 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "unauthorized") {
+      toast.error("Akses Ditolak", {
+        description:
+          "Anda tidak memiliki izin untuk mengakses halaman tersebut.",
+      });
+      // Clear the query param without refreshing
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("error");
+      router.replace(newUrl.pathname + newUrl.search);
+    }
+  }, [searchParams, router]);
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/auth/login" });
@@ -35,7 +53,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/80 backdrop-blur-md border-b">
           <SidebarTrigger />
           <div className="flex items-center gap-2">
-            <ModeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2">
@@ -50,12 +67,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {/* <div className="px-2 py-2 text-sm"> */}
-                <p className="font-medium">{session?.user?.email}</p>
-                <p className="text-xs text-muted-foreground capitalize">
-                  {session?.user?.role || "user"}
-                </p>
-                {/* </div> */}
+                <div className="px-2 py-2 text-sm">
+                  <p className="font-medium">{session?.user?.email}</p>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {session?.user?.role || "user"}
+                  </p>
+                </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -66,6 +83,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <ModeToggle />
           </div>
         </div>
         <div className="p-6">{children}</div>

@@ -49,7 +49,7 @@ export default async function Home() {
         </div>
 
         {session && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+          <div className="flex flex-col gap-6 mt-10">
             {isAdmin && (
               <Link href="/dashboard" className="group">
                 <Card className="h-full hover:shadow-xl transition-all hover:border-blue-400 dark:hover:border-blue-700">

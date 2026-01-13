@@ -5,10 +5,13 @@ import { DashboardStats } from "@/components/dashboard/stat-cards";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { db } from "@/lib/db";
 import { maintenanceRequest } from "@/lib/db/schema";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
   const requests = await db.select().from(maintenanceRequest);
 
   const stats = {
@@ -48,7 +51,7 @@ export default async function DashboardPage() {
 
           {/* Charts Section */}
           <DashboardCharts data={chartData} />
-          <RequestsManagement />
+          <RequestsManagement role={session?.user.role} />
         </div>
       </div>
     </DashboardLayout>

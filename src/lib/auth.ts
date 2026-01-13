@@ -25,7 +25,10 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
         const user = await db.query.users.findFirst({
-          where: eq(users.email, credentials.identifier),
+          where: or(
+            eq(users.email, credentials.identifier),
+            eq(users.username, credentials.identifier)
+          ),
         });
         if (!user) {
           console.log("User not found");
